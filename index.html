@@ -122,6 +122,11 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .cval.active{color:var(--al);}
 .rsub{display:flex;justify-content:space-between;font-size:12px;}
 .rsub span{color:var(--tm)}.rsub strong{color:var(--al)}
+.rprix{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0 8px;}
+.rprix-field label{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;}
+.rprix-field input{width:100%;padding:7px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:6px;color:var(--foam);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;text-align:center;outline:none;transition:border-color .2s;}
+.rprix-field input:focus{border-color:var(--amber);box-shadow:0 0 0 2px var(--aglow);}
+.rprix-changed{font-size:11px;color:var(--orange);margin-top:4px;padding:4px 8px;background:var(--obg);border-radius:4px;}
 .fc{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px;}
 .frow{display:grid;gap:16px;margin-bottom:16px;}
 .frow.c2{grid-template-columns:1fr 1fr}.frow.c3{grid-template-columns:1fr 1fr 1fr}
@@ -881,20 +886,61 @@ function chgR(nom,d){
   updRKPIs();
 }
 
-function resetReappro(){refs.forEach(r=>rqty[r.nom]=0);renderReappro();}
+function updRPrice(nom, field, val){
+  const key = nom.replace(/\W/g,'_');
+  const r = rf(nom);
+  if(!val || isNaN(val)) return;
+  const v = parseInt(val);
+  // Mémoriser le nouveau prix temporairement
+  if(!window._rpriceChanges) window._rpriceChanges = {};
+  if(!window._rpriceChanges[nom]) window._rpriceChanges[nom] = {pa: r.pa, pv: r.pv};
+  window._rpriceChanges[nom][field] = v;
+  // Afficher indicateur changement
+  const ind = document.getElementById('rpc-'+key);
+  const changed = window._rpriceChanges[nom].pa !== r.pa || window._rpriceChanges[nom].pv !== r.pv;
+  if(ind) ind.style.display = changed ? 'block' : 'none';
+  // Mettre à jour le sous-total affiché
+  const q = rqty[nom]||0;
+  const pa = window._rpriceChanges[nom].pa;
+  const rs = document.getElementById('rs-'+key);
+  if(rs) rs.innerHTML = '<span>'+(q>0?q*r.btes+' btes':'Aucune caisse')+'</span><strong>'+(q>0?fmt(q*pa)+' F':'—')+'</strong>';
+}
+
+function resetReappro(){
+  refs.forEach(r=>rqty[r.nom]=0);
+  window._rpriceChanges = {};
+  renderReappro();
+}
 
 function valReappro(){
   const lg=refs.filter(r=>(rqty[r.nom]||0)>0);
   if(!lg.length){toast('Aucune caisse saisie','error');return;}
   const date=document.getElementById('r-date').value||today();
   const comment=document.getElementById('r-comment').value||'Réappro';
+  const changes = window._rpriceChanges || {};
+  let prixMaj = 0;
   lg.forEach(r=>{
     const caisses=rqty[r.nom],btes=caisses*r.btes;
+    // Appliquer les nouveaux prix si modifiés
+    const newPa = changes[r.nom]?.pa ?? r.pa;
+    const newPv = changes[r.nom]?.pv ?? r.pv;
+    const prixChange = newPa !== r.pa || newPv !== r.pv;
+    if(prixChange){
+      const idx = refs.indexOf(r);
+      refs[idx] = {...r, pa: newPa, pv: newPv};
+      prixMaj++;
+    }
+    const coutTotal = caisses * newPa;
     stock[r.nom]=(stock[r.nom]||0)+btes;
-    mouvs.unshift({id:Date.now()+Math.random(),date,type:'reappro',marque:r.nom,delta:btes,stockApres:stock[r.nom],ca:0,comment:`${caisses} cs — ${comment}`});
+    mouvs.unshift({id:Date.now()+Math.random(),date,type:'reappro',marque:r.nom,delta:btes,
+      stockApres:stock[r.nom],ca:0,
+      comment:`${caisses} cs${prixChange?' — nouveau prix: '+newPa+'F/cs':''} — ${comment}`});
   });
   save();resetReappro();updBadge();
-  toast(`Réappro validé — ${lg.length} marque${lg.length>1?'s':''} mises à jour`,'success');
+  const msg = prixMaj > 0
+    ? `Réappro validé — ${lg.length} marque${lg.length>1?'s':''} mises à jour · ${prixMaj} prix mis à jour`
+    : `Réappro validé — ${lg.length} marque${lg.length>1?'s':''} mises à jour`;
+  toast(msg,'success');
 }
 
 // ══════════════════════════════════════
