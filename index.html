@@ -445,9 +445,19 @@ const REFS0=[
   {nom:'Jus (CSD)',cat:'Soft',btes:24,pa:9000,pv:500,min:24},
 ];
 
-let refs=JSON.parse(localStorage.getItem('sb_refs')||'null')||REFS0;
-let stock=JSON.parse(localStorage.getItem('sb_stock')||'{}');
-let mouvs=JSON.parse(localStorage.getItem('sb_mouvs')||'[]');
+let refsRaw = localStorage.getItem('sb_refs');
+let refs = null;
+try {
+  refs = refsRaw ? JSON.parse(refsRaw) : null;
+  // Si refs est vide ou corrompu, on recharge les défauts
+  if (!refs || !Array.isArray(refs) || refs.length === 0) refs = REFS0;
+} catch(e) { refs = REFS0; }
+
+let stock = {};
+try { stock = JSON.parse(localStorage.getItem('sb_stock')||'{}'); } catch(e) { stock = {}; }
+
+let mouvs = [];
+try { mouvs = JSON.parse(localStorage.getItem('sb_mouvs')||'[]'); } catch(e) { mouvs = []; }
 let curCat='',invData={},rqty={},ventesWait=[];
 
 // Auth
