@@ -45,13 +45,13 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
 /* HEADER */
-.header{background:linear-gradient(135deg,#0f1a0c,#0a0c09);border-bottom:1px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;}
-.logo{display:flex;align-items:center;gap:12px;}
-.logo-icon{font-size:28px;filter:drop-shadow(0 0 8px var(--amber));}
-.logo-text{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:3px;color:var(--al);text-shadow:0 0 20px rgba(232,125,30,0.5),0 0 40px rgba(232,125,30,0.2);}
-.logo-sub{font-size:11px;color:var(--tm);font-weight:300;letter-spacing:1px;text-transform:uppercase;margin-top:-2px;}
-.header-right{display:flex;align-items:center;gap:10px;}
-.user-pill{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px 5px 6px;font-size:12px;color:var(--tm);}
+.header{background:linear-gradient(135deg,#0f1a0c,#0a0c09);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:8px;}
+.logo-icon{font-size:24px;filter:drop-shadow(0 0 8px var(--amber));}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:var(--al);text-shadow:0 0 20px rgba(232,125,30,0.5),0 0 40px rgba(232,125,30,0.2);}
+.logo-sub{font-size:9px;color:var(--tm);font-weight:300;letter-spacing:1px;text-transform:uppercase;margin-top:-2px;}
+.header-right{display:flex;align-items:center;gap:6px;}
+.user-pill{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 8px 4px 4px;font-size:11px;color:var(--tm);max-width:120px;}
 .user-avatar{width:24px;height:24px;border-radius:50%;object-fit:cover;}
 .user-name{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .btn-logout{background:none;border:none;color:var(--td);cursor:pointer;font-size:14px;padding:2px 4px;transition:color .2s;}
@@ -59,8 +59,8 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .date-badge{font-size:12px;color:var(--tm);background:var(--bg3);border:1px solid var(--border);padding:6px 14px;border-radius:20px;}
 
 /* NAV */
-.nav{background:var(--bg2);border-bottom:2px solid var(--mint-dim);padding:0 32px;display:flex;gap:4px;overflow-x:auto;}
-.nav-tab{padding:14px 20px;font-size:13px;font-weight:500;color:var(--tm);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:8px;user-select:none;}
+.nav{background:var(--bg2);border-bottom:2px solid var(--mint-dim);padding:0 8px;display:flex;gap:2px;overflow-x:auto;}
+.nav-tab{padding:12px 14px;font-size:12px;font-weight:500;color:var(--tm);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:6px;user-select:none;}
 .nav-tab:hover{color:var(--text);}
 .nav-tab.active{color:var(--al);border-bottom-color:var(--amber);text-shadow:0 0 10px rgba(232,125,30,0.4);}
 .nav-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
@@ -187,10 +187,14 @@ tbody tr:hover td{background:var(--card2);}
 .bnw{background:var(--rbg);border:1px solid var(--red);color:var(--rl)}
 .ref-act{display:flex;gap:8px;}
 @media(max-width:768px){
-  .header,.nav,.page{padding-left:16px;padding-right:16px;}
+  .page{padding-left:12px;padding-right:12px;}
   .frow.c2,.frow.c3{grid-template-columns:1fr;}
   .charts-row{grid-template-columns:1fr;}
   .kpi-row{grid-template-columns:1fr 1fr;}
+  .date-badge{display:none;}
+  .logo-sub{display:none;}
+  .sync-bar span{display:none;}
+  .user-name{display:none;}
 }
 </style>
 </head>
@@ -325,6 +329,15 @@ tbody tr:hover td{background:var(--card2);}
   <!-- CORRECTIONS -->
   <div class="page" id="page-corr">
     <div class="banner bnw">⚠️ Réservé aux <strong>corrections exceptionnelles</strong> : casse, offert, erreur de comptage.</div>
+  <div class="fc" style="margin-bottom:20px;border-color:var(--red);background:rgba(192,64,64,0.05);">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div>
+        <div style="font-weight:700;color:var(--rl);margin-bottom:4px;">🗑 Réinitialisation complète</div>
+        <div style="font-size:12px;color:var(--tm);">Efface tout le stock, l'historique et repart de zéro. Les références (marques) sont conservées.</div>
+      </div>
+      <button class="btn btn-r" onclick="resetComplet()">⚠️ Tout remettre à zéro</button>
+    </div>
+  </div>
     <div class="sec-title">Correction manuelle</div>
     <div class="fc">
       <div class="frow c3">
@@ -815,8 +828,16 @@ function onII(nom,val){
 function resetInv(){invData={};refs.forEach(r=>invData[r.nom]=null);renderInv();}
 
 function calcVentes(){
-  refs.forEach(r=>{const key=r.nom.replace(/\W/g,'_'),el=document.getElementById('ii-'+key);if(el)invData[r.nom]=el.value===''?null:parseInt(el.value);});
-  const saisis=refs.filter(r=>invData[r.nom]!==null&&invData[r.nom]!==undefined);
+  // Lire tous les inputs inventaire depuis le DOM
+  refs.forEach(r=>{
+    const key=r.nom.replace(/\W/g,'_');
+    const el=document.getElementById('ii-'+key);
+    if(el){
+      const v=el.value;
+      invData[r.nom]=(v===''||v===null||v===undefined)?null:parseInt(v);
+    }
+  });
+  const saisis=refs.filter(r=>invData[r.nom]!==null&&invData[r.nom]!==undefined&&!isNaN(invData[r.nom]));
   if(!saisis.length){toast('Saisissez au moins une marque','error');return;}
   const first=!mouvs.some(m=>m.type==='inventaire');
   ventesWait=saisis.map(r=>{
@@ -988,6 +1009,25 @@ function renderAnalytics(){
 // ══════════════════════════════════════
 //  CORRECTIONS
 // ══════════════════════════════════════
+function resetComplet(){
+  if(!confirm('Remettre toutes les données à zéro ?\nStock, historique et mouvements seront effacés.\nLes références (marques) seront conservées.\n\nCette action est irréversible !')) return;
+  // Remettre le stock à 0 pour toutes les refs
+  refs.forEach(r=>stock[r.nom]=0);
+  // Vider l'historique
+  mouvs=[];
+  // Réinitialiser les états
+  invData={};
+  refs.forEach(r=>invData[r.nom]=null);
+  rqty={};
+  refs.forEach(r=>rqty[r.nom]=0);
+  save();
+  updBadge();
+  renderSKPIs();
+  renderAlerts();
+  renderStock();
+  toast('Données remises à zéro — références conservées','success');
+}
+
 function popCorrM(){
   document.getElementById('c-marque').innerHTML=refs.map(r=>`<option value="${r.nom}">${r.nom}</option>`).join('');
   document.getElementById('c-date').value=today();
