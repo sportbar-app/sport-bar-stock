@@ -434,7 +434,7 @@ tbody tr:hover td{background:var(--card2);}
 // ══════════════════════════════════════
 const CLIENT_ID = '940672653552-inbojbv5arn0v1dmdjke9oa8vm80agpg.apps.googleusercontent.com';
 const SCOPES = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive.file';
-const SHEET_NAME = 'Le Sport Bar — Stock';
+const SHARED_SHEET_ID = '1rek6paahYvlpwNLO5B0LZbFx9b_PrXC_AotnvSGtBg0'; // Sheet unique partagé de Davila
 
 // ══════════════════════════════════════
 //  ÉTAT
@@ -609,34 +609,16 @@ async function initSheet(){
   if(!accessToken) return;
   setSyncStatus('syncing', 'Connexion...');
   try {
-    if(sheetId){
-      // Vérifier que le sheet existe encore
-      try {
-        await apiSheets('GET', `/${sheetId}?fields=spreadsheetId`);
-      } catch(e){
-        sheetId=null;
-        localStorage.removeItem('sb_sheetId');
-      }
-    }
-    if(!sheetId){
-      // Créer le Google Sheet
-      const created = await apiSheets('POST', '', {
-        properties: { title: SHEET_NAME },
-        sheets: [
-          { properties: { title: 'Stock', sheetId: 0 } },
-          { properties: { title: 'Mouvements', sheetId: 1 } },
-          { properties: { title: 'Références', sheetId: 2 } },
-        ]
-      });
-      sheetId = created.spreadsheetId;
-      localStorage.setItem('sb_sheetId', sheetId);
-      toast('📊 Google Sheet créé automatiquement !', 'success');
-      await initSheetHeaders();
-    }
+    // Toujours utiliser le Sheet partagé
+    sheetId = SHARED_SHEET_ID;
+    localStorage.setItem('sb_sheetId', sheetId);
+    // Vérifier que l'accès est possible
+    await apiSheets('GET', `/${sheetId}?fields=spreadsheetId`);
     await syncToSheet();
+    toast('📊 Connecté au Sheet partagé', 'success');
   } catch(e){
     setSyncStatus('error', 'Erreur sync');
-    toast('Erreur de connexion Google Sheets', 'error');
+    toast('Erreur de connexion au Google Sheet partagé', 'error');
     console.error(e);
   }
 }
