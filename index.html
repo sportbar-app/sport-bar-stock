@@ -87,6 +87,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
 .bname{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;color:var(--foam);margin-bottom:4px;}
 .bcat{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;}
 .cl{background:rgba(46,117,182,.15);color:#6ab0e0}.cp{background:rgba(212,130,10,.15);color:var(--al)}.ce{background:rgba(22,160,133,.15);color:#2ecc71}.cs{background:rgba(155,89,182,.15);color:#bb8fce}
+.cv{background:rgba(128,0,128,.15);color:#cc88ff}.cw{background:rgba(139,69,19,.15);color:#d4a060}
 .bstats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
 .slbl{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:1px;}
 .sval{font-size:1.05rem;font-weight:600;color:var(--foam);margin-top:2px;}
@@ -260,6 +261,8 @@ tbody tr:hover td{background:var(--card2);}
         <button class="cbtn" data-cat="Bière premium" onclick="setCat(this,'Bière premium')">⭐ Premium</button>
         <button class="cbtn" data-cat="Eau" onclick="setCat(this,'Eau')">💧 Eau</button>
         <button class="cbtn" data-cat="Soft" onclick="setCat(this,'Soft')">🥤 Soft</button>
+      <button class="cbtn" data-cat="Vins" onclick="setCat(this,'Vins')">🍷 Vins</button>
+      <button class="cbtn" data-cat="Liqueurs" onclick="setCat(this,'Liqueurs')">🥃 Liqueurs</button>
       </div>
     </div>
     <div class="stock-grid" id="s-grid"></div>
@@ -387,6 +390,8 @@ tbody tr:hover td{background:var(--card2);}
             <option value="Bière premium">⭐ Bière premium</option>
             <option value="Eau">💧 Eau</option>
             <option value="Soft">🥤 Soft</option>
+          <option value="Vins">🍷 Vins</option>
+          <option value="Liqueurs">🥃 Liqueurs</option>
           </select>
         </div>
         <div><label class="fg-lbl">Unités / caisse</label><input class="finput" type="number" id="rb" value="12" min="1"></div>
@@ -491,8 +496,8 @@ function today(){return new Date().toISOString().split('T')[0];}
 function fmt(n){return new Intl.NumberFormat('fr-FR').format(Math.round(n));}
 function fd(iso){if(!iso)return'—';const[y,m,d]=iso.split('-');return`${d}/${m}/${y}`;}
 function csplit(r,b){return{c:Math.floor(b/r.btes),b:b%r.btes};}
-function catcls(c){return{'Bière locale':'cl','Bière premium':'cp','Eau':'ce','Soft':'cs'}[c]||'cl';}
-function badge(c){const i={'Bière locale':'🍺','Bière premium':'⭐','Eau':'💧','Soft':'🥤'}[c]||'';return`<span class="bcat ${catcls(c)}">${i} ${c}</span>`;}
+function catcls(c){return{'Bière locale':'cl','Bière premium':'cp','Eau':'ce','Soft':'cs','Vins':'cv','Liqueurs':'cw'}[c]||'cl';}
+function badge(c){const i={'Bière locale':'🍺','Bière premium':'⭐','Eau':'💧','Soft':'🥤','Vins':'🍷','Liqueurs':'🥃'}[c]||'';return`<span class="bcat ${catcls(c)}">${i} ${c}</span>`;}
 function toast(msg,type='info'){
   const t=document.getElementById('toast');
   t.innerHTML=`<span>${type==='success'?'✓':type==='error'?'✕':'ℹ'}</span><span>${msg}</span>`;
